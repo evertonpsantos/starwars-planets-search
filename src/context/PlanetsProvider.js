@@ -56,6 +56,24 @@ export default function PlanetsProvider({ children }) {
     if (order.sort === 'ASC') {
       const planetsList = [...filteredList];
       const orderedList = planetsList.sort((a, b) => a[order.column] - b[order.column]);
+      if (order.column === 'population') {
+        orderedList.forEach((planet) => {
+          if (planet.population === 'unknown') {
+            const unknownPlanet = orderedList.indexOf(planet);
+            const spliced = orderedList.splice(unknownPlanet, 1);
+            orderedList.push(spliced[0]);
+          }
+        });
+
+        orderedList.forEach((element) => {
+          if (element.population === 'unknown') {
+            const unknownPlanet = orderedList.indexOf(element);
+            const spliced = orderedList.splice(unknownPlanet, 1);
+            orderedList.push(spliced[0]);
+          }
+        });
+      }
+
       setFilteredList(orderedList);
     }
 
