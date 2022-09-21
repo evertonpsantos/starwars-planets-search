@@ -29,23 +29,25 @@ export default function PlanetsProvider({ children }) {
   }, [filterByName]);
 
   useEffect(() => {
-    filterByNumericValues.forEach(({ column, comparison, value }) => {
-      if (comparison === 'maior que') {
-        const filteredByNumbers = filteredList
-          .filter((planet) => planet[column] > Number(value));
-        return setFilteredList(filteredByNumbers);
-      }
-      if (comparison === 'menor que') {
-        const filteredByNumbers = filteredList
-          .filter((planet) => planet[column] < Number(value));
-        return setFilteredList(filteredByNumbers);
-      }
-      if (comparison === 'igual a') {
-        const filteredByNumbers = filteredList
-          .filter((planet) => Number(planet[column]) === Number(value));
-        return setFilteredList(filteredByNumbers);
-      }
-    });
+    if (filterByNumericValues) {
+      filterByNumericValues.forEach(({ column, comparison, value }) => {
+        if (comparison === 'maior que') {
+          const filteredByNumbers = filteredList
+            .filter((planet) => planet[column] > Number(value));
+          return setFilteredList(filteredByNumbers);
+        }
+        if (comparison === 'menor que') {
+          const filteredByNumbers = filteredList
+            .filter((planet) => planet[column] < Number(value));
+          return setFilteredList(filteredByNumbers);
+        }
+        if (comparison === 'igual a') {
+          const filteredByNumbers = filteredList
+            .filter((planet) => Number(planet[column]) === Number(value));
+          return setFilteredList(filteredByNumbers);
+        }
+      });
+    }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [filterByNumericValues]);
 
@@ -66,11 +68,26 @@ export default function PlanetsProvider({ children }) {
     setNumericFilter((prevFilters) => [...prevFilters, filterValues]);
   };
 
+  const removeFilter = (newList) => {
+    const copyPlanets = [...planets];
+    setFilteredList(copyPlanets);
+    return setNumericFilter(newList);
+  };
+
+  const removeAllFilters = () => {
+    const copyPlanets = [...planets];
+    setFilteredList(copyPlanets);
+    setNumericFilter();
+  };
+
   const contextValue = {
     planets,
     filteredList,
+    filterByNumericValues,
     filterPlanetsByName,
     filterByNumbers,
+    removeFilter,
+    removeAllFilters,
   };
 
   return (

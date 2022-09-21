@@ -14,7 +14,8 @@ export default function Filters() {
   const [inputText, setName] = useState('');
   const [numericFilters, setFilters] = useState(INIT_STATE);
   const [columnOptions, setColumnOptions] = useState(columnSelectOptions);
-  const { filterPlanetsByName, filterByNumbers } = useContext(planetsContext);
+  const { filterPlanetsByName, filterByNumbers,
+    filterByNumericValues, removeFilter, removeAllFilters } = useContext(planetsContext);
 
   const handleTextChange = ({ target }) => {
     setName(target.value);
@@ -44,51 +45,87 @@ export default function Filters() {
     }));
   };
 
+  const deleteFilter = (column) => {
+    const removedFilter = filterByNumericValues
+      .filter((filter) => filter.column !== column);
+    removeFilter(removedFilter);
+    setColumnOptions((prevState) => [...prevState, column]);
+  };
+
+  const clearFilters = () => {
+    removeAllFilters();
+    setColumnOptions(columnSelectOptions);
+  };
+
   return (
-    <section>
-      <input
-        type="text"
-        data-testid="name-filter"
-        onChange={ handleTextChange }
-        value={ inputText }
-        id="name-filter"
-        placeholder="Procure pelo nome"
-      />
+    <>
+      <section>
+        <input
+          type="text"
+          data-testid="name-filter"
+          onChange={ handleTextChange }
+          value={ inputText }
+          id="name-filter"
+          placeholder="Procure pelo nome"
+        />
 
-      <select
-        data-testid="column-filter"
-        onChange={ handleNumericValues }
-        name="columnFilter"
-      >
-        { columnOptions
-          .map((option) => <option value={ option } key={ option }>{option}</option>)}
-      </select>
+        <select
+          data-testid="column-filter"
+          onChange={ handleNumericValues }
+          name="columnFilter"
+        >
+          { columnOptions
+            .map((option) => <option value={ option } key={ option }>{option}</option>)}
+        </select>
 
-      <select
-        data-testid="comparison-filter"
-        onChange={ handleNumericValues }
-        name="comparisonFilter"
-      >
-        <option value="maior que">maior que</option>
-        <option value="menor que">menor que</option>
-        <option value="igual a">igual a</option>
-      </select>
+        <select
+          data-testid="comparison-filter"
+          onChange={ handleNumericValues }
+          name="comparisonFilter"
+        >
+          <option value="maior que">maior que</option>
+          <option value="menor que">menor que</option>
+          <option value="igual a">igual a</option>
+        </select>
 
-      <input
-        type="number"
-        data-testid="value-filter"
-        onChange={ handleNumericValues }
-        name="valueFilter"
-        value={ numericFilters.valueFilter }
-      />
+        <input
+          type="number"
+          data-testid="value-filter"
+          onChange={ handleNumericValues }
+          name="valueFilter"
+          value={ numericFilters.valueFilter }
+        />
 
-      <button
-        type="button"
-        data-testid="button-filter"
-        onClick={ submitValues }
-      >
-        Filtrar
-      </button>
-    </section>
+        <button
+          type="button"
+          data-testid="button-filter"
+          onClick={ submitValues }
+        >
+          Filtrar
+        </button>
+      </section>
+      <section>
+        { filterByNumericValues && (
+          filterByNumericValues.map(({ column, comparison, value }, index) => (
+            <span key={ index } data-testid="filter" id={ index }>
+              <p>
+                {column}
+                {' '}
+                {comparison}
+                {' '}
+                {value}
+              </p>
+              <button type="button" onClick={ () => deleteFilter(column) }>🗑️</button>
+            </span>))
+        )}
+        <button
+          type="button"
+          data-testid="button-remove-filters"
+          onClick={ clearFilters }
+        >
+          Remover Filtros
+        </button>
+      </section>
+    </>
   );
 }
