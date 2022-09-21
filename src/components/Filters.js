@@ -7,9 +7,13 @@ const INIT_STATE = {
   valueFilter: 0,
 };
 
+const columnSelectOptions = ['population', 'orbital_period',
+  'diameter', 'rotation_period', 'surface_water'];
+
 export default function Filters() {
   const [inputText, setName] = useState('');
   const [numericFilters, setFilters] = useState(INIT_STATE);
+  const [columnOptions, setColumnOptions] = useState(columnSelectOptions);
   const { filterPlanetsByName, filterByNumbers } = useContext(planetsContext);
 
   const handleTextChange = ({ target }) => {
@@ -30,6 +34,14 @@ export default function Filters() {
 
   const submitValues = () => {
     filterByNumbers(numericFilters);
+    const selectedColumn = columnOptions.indexOf(numericFilters.columnFilter);
+    const restingOptions = [...columnOptions];
+    restingOptions.splice(selectedColumn, 1);
+    setColumnOptions(restingOptions);
+    setFilters((prevState) => ({
+      ...prevState,
+      columnFilter: restingOptions ? restingOptions[0] : '',
+    }));
   };
 
   return (
@@ -48,11 +60,8 @@ export default function Filters() {
         onChange={ handleNumericValues }
         name="columnFilter"
       >
-        <option value="population">population</option>
-        <option value="orbital_period">orbital_period</option>
-        <option value="diameter">diameter</option>
-        <option value="rotation_period">rotation_period</option>
-        <option value="surface_water">surface_water</option>
+        { columnOptions
+          .map((option) => <option value={ option } key={ option }>{option}</option>)}
       </select>
 
       <select
