@@ -9,6 +9,7 @@ export default function PlanetsProvider({ children }) {
   const [filteredList, setFilteredList] = useState(planets);
   const [filterByName, setNameFilter] = useState({});
   const [filterByNumericValues, setNumericFilter] = useState([]);
+  const [order, setOrder] = useState({});
 
   useEffect(() => {
     const getPlanets = async () => {
@@ -51,6 +52,21 @@ export default function PlanetsProvider({ children }) {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [filterByNumericValues]);
 
+  useEffect(() => {
+    if (order.sort === 'ASC') {
+      const planetsList = [...filteredList];
+      const orderedList = planetsList.sort((a, b) => a[order.column] - b[order.column]);
+      setFilteredList(orderedList);
+    }
+
+    if (order.sort === 'DESC') {
+      const planetsList = [...filteredList];
+      const orderedList = planetsList.sort((a, b) => b[order.column] - a[order.column]);
+      setFilteredList(orderedList);
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [order]);
+
   const filterPlanetsByName = (inputValue) => {
     const nameInput = {
       name: inputValue,
@@ -80,6 +96,10 @@ export default function PlanetsProvider({ children }) {
     setNumericFilter();
   };
 
+  const orderList = (chosenOrder) => {
+    setOrder(chosenOrder);
+  };
+
   const contextValue = {
     planets,
     filteredList,
@@ -88,6 +108,7 @@ export default function PlanetsProvider({ children }) {
     filterByNumbers,
     removeFilter,
     removeAllFilters,
+    orderList,
   };
 
   return (

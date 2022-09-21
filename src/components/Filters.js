@@ -1,10 +1,15 @@
 import React, { useContext, useEffect, useState } from 'react';
 import planetsContext from '../context/PlanetsContext';
 
-const INIT_STATE = {
+const INIT_STATE_NUMERIC = {
   columnFilter: 'population',
   comparisonFilter: 'maior que',
   valueFilter: 0,
+};
+
+const INIT_STATE_ORDER = {
+  columnOrder: 'population',
+  sortOrder: '',
 };
 
 const columnSelectOptions = ['population', 'orbital_period',
@@ -12,10 +17,18 @@ const columnSelectOptions = ['population', 'orbital_period',
 
 export default function Filters() {
   const [inputText, setName] = useState('');
-  const [numericFilters, setFilters] = useState(INIT_STATE);
+  const [numericFilters, setFilters] = useState(INIT_STATE_NUMERIC);
   const [columnOptions, setColumnOptions] = useState(columnSelectOptions);
+  const [orderInput, setOrderInputs] = useState(INIT_STATE_ORDER);
+
   const { filterPlanetsByName, filterByNumbers,
-    filterByNumericValues, removeFilter, removeAllFilters } = useContext(planetsContext);
+    filterByNumericValues, removeFilter, removeAllFilters,
+    orderList } = useContext(planetsContext);
+
+  useEffect(() => {
+    filterPlanetsByName(inputText);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [inputText]);
 
   const handleTextChange = ({ target }) => {
     setName(target.value);
@@ -28,10 +41,12 @@ export default function Filters() {
     }));
   };
 
-  useEffect(() => {
-    filterPlanetsByName(inputText);
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [inputText]);
+  const handleOrder = ({ target }) => {
+    setOrderInputs((prevState) => ({
+      ...prevState,
+      [target.name]: target.value,
+    }));
+  };
 
   const submitValues = () => {
     filterByNumbers(numericFilters);
@@ -43,6 +58,14 @@ export default function Filters() {
       ...prevState,
       columnFilter: restingOptions ? restingOptions[0] : '',
     }));
+  };
+
+  const submitOrder = () => {
+    const orderObj = {
+      column: orderInput.columnOrder,
+      sort: orderInput.sortOrder,
+    };
+    orderList(orderObj);
   };
 
   const deleteFilter = (column) => {
@@ -118,14 +141,56 @@ export default function Filters() {
               <button type="button" onClick={ () => deleteFilter(column) }>🗑️</button>
             </span>))
         )}
+      </section>
+      <section>
+        <select
+          data-testid="column-sort"
+          onChange={ handleOrder }
+          name="columnOrder"
+        >
+          { columnOptions
+            .map((option) => <option value={ option } key={ option }>{option}</option>)}
+        </select>
+
+        <label htmlFor="order-asc">
+          <input
+            type="radio"
+            data-testid="column-sort-input-asc"
+            value="ASC"
+            id="order-asc"
+            name="sortOrder"
+            onChange={ handleOrder }
+          />
+          Ascendente
+        </label>
+        <label htmlFor="order-desc">
+          <input
+            type="radio"
+            data-testid="column-sort-input-desc"
+            value="DESC"
+            id="order-desc"
+            name="sortOrder"
+            onChange={ handleOrder }
+          />
+          Descendente
+        </label>
+
         <button
           type="button"
-          data-testid="button-remove-filters"
-          onClick={ clearFilters }
+          data-testid="column-sort-button"
+          onClick={ submitOrder }
         >
-          Remover Filtros
+          Ordenar
         </button>
       </section>
+
+      <button
+        type="button"
+        data-testid="button-remove-filters"
+        onClick={ clearFilters }
+      >
+        Remover Filtros
+      </button>
     </>
   );
 }

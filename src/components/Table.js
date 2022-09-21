@@ -26,7 +26,7 @@ export default function Table() {
       <tbody>
         {filteredList.map((planet, index) => (
           <tr key={ `${planet.name}${index} ` }>
-            <td>{planet.name}</td>
+            <td data-testid="planet-name">{planet.name}</td>
             <td>{planet.rotation_period}</td>
             <td>{planet.orbital_period}</td>
             <td>{planet.diameter}</td>
