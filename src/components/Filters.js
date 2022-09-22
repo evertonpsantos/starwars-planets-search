@@ -56,7 +56,7 @@ export default function Filters() {
     setColumnOptions(restingOptions);
     setFilters((prevState) => ({
       ...prevState,
-      columnFilter: restingOptions ? restingOptions[0] : '',
+      columnFilter: restingOptions[0],
     }));
   };
 
@@ -138,7 +138,12 @@ export default function Filters() {
                 {' '}
                 {value}
               </p>
-              <button type="button" onClick={ () => deleteFilter(column) }>🗑️</button>
+              <button
+                type="button"
+                onClick={ () => deleteFilter(column) }
+              >
+                Deletar filtro
+              </button>
             </span>))
         )}
       </section>
